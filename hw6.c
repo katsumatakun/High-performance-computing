@@ -7,14 +7,14 @@
 int main(int argc, char* argv[]){
 
   FILE *fp;
-  if((fp = fopen("matrix.txt", "r")) == NULL ) {
-    printf("Input file not open\n");
-    return -1;
-  }
-  // if((fp = fopen("higgs-twitter.mtx", "r")) == NULL ) {
+  // if((fp = fopen("matrix.txt", "r")) == NULL ) {
   //   printf("Input file not open\n");
   //   return -1;
   // }
+  if((fp = fopen("higgs-twitter.mtx", "r")) == NULL ) {
+    printf("Input file not open\n");
+    return -1;
+  }
 
   // printf("%s\n",argv[1]);
   // printf("%d\n",block_index(11,4,8));
@@ -40,6 +40,7 @@ int main(int argc, char* argv[]){
     invec2[i] = 2147483647;
   }
   invec[0] = 0;
+  invec2[0] = 0;
   int* rowPtr = (int*) (malloc(sizeof(int)*(n+1)));
   int* outvec2 = (int*) (malloc(sizeof(int)*n));
   // int* ans = (int*) (malloc(sizeof(int)*n));
@@ -53,9 +54,9 @@ int main(int argc, char* argv[]){
 
   while(fscanf(fp,"%d",&ptr[0]) != EOF && fscanf(fp,"%d",&ptr[1]) != EOF && fscanf(fp, "%d", &ptr[2]) != EOF){
     // printf("%d %d %d\n", ptr[0], ptr[1], ptr[2]);
-    // printf("row:%d col:%d\n", ptr[0], ptr[1]);
-    if(ptr[1]==0)
-      printf("%d\n",ptr[1]);
+    printf("row:%d col:%d\n", ptr[0], ptr[1]);
+    // if(ptr[1]==0)
+    //   printf("%d\n",ptr[1]);
     if(ptr[0]==row){
       col_index[count] = ptr[1];
       data[count] = ptr[2];
@@ -81,17 +82,29 @@ int main(int argc, char* argv[]){
     // ans[j-1]=rowPtr[j]-rowPtr[j-1];
 }
 
-int* temp
-for (int iter=0; iter<n; iter++){
-  for (int i = 0; i < n ; i++) {
-    for (int j = rowPtr[i]; j < rowPtr[i+1]; j++) {
-        int v = col_index[j];
-        int weight = data[j];
-        if (invec[i] + weight < invec[v])
-            invec[v] = invec[i] + weight;
+int* temp;
+int flag;
+int ans = 0;
+  for (int iter=0; iter<n; iter++){
+    printf("iter\n");
+    flag = 0;
+    for (int i = 0; i < n ; i++) {
+      for (int j = rowPtr[i]; j < rowPtr[i+1]; j++) {
+          int v = col_index[j];
+          int weight = data[j];
+          if (invec[v] != 2147483647 && invec[v] + weight < invec2[i]){
+              flag=1;
+              invec2[i] = invec[v] + weight;
+            }
           }
-      }
-      temp = invec;
-}
-  printf("100: %d\n", invec[3]);
+        }
+        temp = invec; invec = invec2; invec2=temp;
+        if(!flag)
+          break;
+
+        // for(int i=0; i<n; i++){
+        //   invec[i] = invec2[i];
+        // }
+  }
+  printf("100: %d\n", invec[100]);
 }
