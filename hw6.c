@@ -100,7 +100,7 @@ int main(int argc, char* argv[]){
   pthread_t *threads;
   void *th_status;
   char* cptr;
-  printf("aaaaaa\n");
+  // printf("aaaaaa\n");
   if (argc>1){
     num_threads = (int) strtol(argv[1], &cptr, 10);
   }
@@ -108,7 +108,7 @@ int main(int argc, char* argv[]){
     num_threads = 1;
   }
   // num_threads = 2;
-  printf("%d\n",n );
+  // printf("%d\n",n );
   printf("num thread %d\n", num_threads);
   int* ids = (int*)malloc(sizeof(int)*num_threads);
   threads = (pthread_t*)malloc(sizeof(pthread_t)*num_threads);
@@ -119,11 +119,9 @@ int main(int argc, char* argv[]){
   for (int tn=0; tn<num_threads; tn++){
     ids[tn] = tn;
     int results = pthread_create(&threads[tn], NULL, BellmanFord, (void*)&ids[tn]);
-    // int results = pthread_create(&threads[tn], NULL, test, (void*)&ids[tn]);
     // printf("create %d\n", results);
   }
 
-  // pthread_barrier_wait(&barrier);
   for (int tn=0; tn<num_threads; tn++){
     int join = pthread_join(threads[tn], NULL);
     // printf("join %d\n", join);
@@ -134,15 +132,9 @@ int main(int argc, char* argv[]){
   printf("%d threads time: %f\n",num_threads,time_elapsed_in_seconds);
 
 
-  printf("%d threads 100: %d, %d\n",num_threads, invec[100], invec[0]);
+  // printf("%d threads 100: %d, %d\n",num_threads, invec[100], invec[0]);
   free(ids);
   free(threads);
-  // for (int i=0; i<n; i++){
-  //   invec[i] = 2147483647;
-  //   invec2[i] = 2147483647;
-  // }
-  // invec[0] = 0;
-  // invec2[0] = 0;
   printf("%d threads done\n", num_threads);
 
 
@@ -170,14 +162,8 @@ int main(int argc, char* argv[]){
 //           break;
 //         temp = invec; invec = invec2; invec2=temp;
 //   }
-  printf("100: %d, %d\n", invec[100], invec[0]);
-}
-
-void* test(void* tn){
-  printf("test working\n");
-  flag+=1;
-  printf("flag %d\n", flag);
-  pthread_exit(NULL);
+  printf("100: %d\n", invec[100]);
+  // printf("%d %d %d %d\n", invec[27613], invec[49876], invec[123], invec[220]);
 }
 
 void* BellmanFord(void* tn){
@@ -185,11 +171,9 @@ void* BellmanFord(void* tn){
   int bsize = n/num_threads;
   int tid = *((int*) tn);
   // printf("%d", tid);
-  // int flag;
   // pthread_barrier_wait(&barrier);
   for (int k=0; k<n; k++){
     // printf("iter");
-    flag = 0;
     for (int i=tid*bsize; i< (tid+1)*bsize; i++) {
       for (int j = rowPtr[i]; j < rowPtr[i+1]; j++) {
           int v = col_index[j];
@@ -203,6 +187,7 @@ void* BellmanFord(void* tn){
         pthread_barrier_wait(&barrier);
         // printf("id %d\n", tid);
         if(tid==0){
+        flag = 0;
         // printf("merge\n" );
         for(int i=0; i<n; i++){
           if(invec[i]!=invec2[i])
@@ -210,19 +195,13 @@ void* BellmanFord(void* tn){
           invec[i] = invec2[i];
         }
       }
-      // for(int i=0; i<n; i++){
-      //     invec[i] = invec2[i];
-      //   }
-          // temp = invec; invec = invec2; invec2=temp;
-        pthread_barrier_wait(&barrier2);
 
-        // printf("flag %d id %d\n",flag, tid );
+      //making sure all threads wait until thread0 updates the flag
+        pthread_barrier_wait(&barrier);
+
         if(!flag){
-          // printf("break %d\n", tid);
-          // pthread_barrier_wait(&barrier);
           break;
         }
-        pthread_barrier_wait(&barrier2);
     }
     pthread_exit(NULL);
 }

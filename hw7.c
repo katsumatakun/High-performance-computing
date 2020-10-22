@@ -112,26 +112,28 @@ int main(int argc, char* argv[]){
   int val;
   int i;
   int j;
-
-
-   clock_t start = clock();
-   #pragma omp parallel for reduction(+, outvec), num_threads(num_threads)
-   {
-   for (i=0; i<n; i++) {
-     for (j=rowPtr[i]; j<rowPtr[i+1]; j++){
-       col = col_index[j];
-       val = data[j];
-       outvec[i] += val * invec[col];
-     }
-   }
+  printf("num_threads %d\n", num_threads);
+  clock_t start = clock();
+  #pragma omp parallel for num_threads(num_threads)
+  {
+    for (i=0; i<n; i++) {
+      int sum=0;
+      for (j=rowPtr[i]; j<rowPtr[i+1]; j++){
+        col = col_index[j];
+        val = data[j];
+        sum += val * invec[col];
+      }
+      outvec[i] = sum;
+    }
  }
 
    clock_t end = clock();
    double time_elapsed_in_seconds = (double)(end - start)/CLOCKS_PER_SEC;
    printf("num_threads: %d, time: %f\n",num_threads, time_elapsed_in_seconds);
-   printf("out[40]: %d\n", outvec[40], outvec[0]);
+   printf("out[40]: %d\n", outvec[40]);
+   // printf("test %d %d %d %d\n",outvec[100000], outvec[22222], outvec[9999], outvec[400000]);
 
-   // 
+   //
    // for (i=0; i<n; i++) {
    //   ans[i]=0;
    //   for (j=rowPtr[i]; j<rowPtr[i+1]; j++){
