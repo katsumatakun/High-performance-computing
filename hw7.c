@@ -108,19 +108,16 @@ int main(int argc, char* argv[]){
     num_threads = 1;
   }
   // num_threads = 2;
-  int col;
-  int val;
-  int i;
-  int j;
+
   printf("num_threads %d\n", num_threads);
   clock_t start = clock();
   #pragma omp parallel for num_threads(num_threads)
   {
-    for (i=0; i<n; i++) {
+    for (int i=0; i<n; i++) {
       int sum=0;
-      for (j=rowPtr[i]; j<rowPtr[i+1]; j++){
-        col = col_index[j];
-        val = data[j];
+      for (int j=rowPtr[i]; j<rowPtr[i+1]; j++){
+        int col = col_index[j];
+        int val = data[j];
         sum += val * invec[col];
       }
       outvec[i] = sum;
