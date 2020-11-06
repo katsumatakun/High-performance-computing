@@ -1,0 +1,19 @@
+First loading data in COO format such that tiling works. 
+Does 2D tile goes row by row ? Does each 2D tile have the same size?
+Should each tile include only one element in each row because ofthe data race?
+How should I set padding for 2D tile?
+The length of colmun, row, and weight vectors change depending on the
+number of paddings?
+
+non-zeros are not row by row 
+size of each tile is the same 
+length of weight vector is larger than actual 
+dummy element is accessing the real data 
+
+16 consecutive elements shouldn't come from the same row for row index array
+
+iterate over all numbers pick 16 numbers once you see the same, skip. 
+
+First do tiling to create the row array. then do grouping(reordering row array) so that 16 consecutive
+elemements don't come from the same row.
+
