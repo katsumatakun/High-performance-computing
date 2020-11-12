@@ -116,7 +116,6 @@ int main()
   int *Col = new int[vec_size];
   float *Val = new float[vec_size];
   int mask_size = (vec_size+15)/16;
-  __mmask16*  padding_masks = new __mmask16[mask_size];
 
   int idx=0;
   int num_sixteen = 0;
@@ -162,7 +161,7 @@ for (int k=0; k<nr; k++){
     __m512 vnewweight = _mm512_add_ps(vinvec, vval);
     __m512i vr = _mm512_load_epi32(&Row[i]);
     // __mmask16 mm = _mm512_cmpeq_ps_mask(vval, one);
-    __mmask16 mm = _mm512_cmp_ps_mask(vval, zeros, _MM_CMPINT_GT);
+    __mmask16 mm = _mm512_cmp_ps_mask(vval, zeros, _MM_CMPINT_GT); //vval[0,1,1,1,1,0] [0, 0, 0 ,0, 0]
 
     __m512 vinvec2 = _mm512_mask_i32gather_ps(zeros, mm, vr,invec2, 4);
     // _mm512_mask_i32gather_ps (__m512 src, __mmask16 k, __m512i vindex, void const* base_addr, int scale)
@@ -204,7 +203,7 @@ for (int k=0; k<nr; k++){
       break;
   }
 
-
+  //Comparing Results of SIMD and Sequencial Code
   for(int i=0; i<nr; i++){
     if(invec2[i] != invec_serial2[i]){
       cout << "not match ";
